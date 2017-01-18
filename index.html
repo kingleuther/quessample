@@ -20,13 +20,41 @@
     </form>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.js"   integrity="sha256-5i/mQ300M779N2OVDrl16lbohwXNUdzL/R2aVUXyXWA="   crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.js"    crossorigin="anonymous"></script>
     <script>
-        const socket = io();
-        $('form').submit(() => {
-            socket.emit('chat message', $('#m').val());
-            $('#m').val('');
-            return false;
+
+
+
+      // get uid
+      var url   = location.href;
+      params    = url.split("?");
+      spparams   = params[1].split("&");
+      ruid = spparams[0].split("=");
+      var uid = ruid[1];
+
+      var socket = io();
+      
+
+//      var room = 'U6536996273dbecdfd95f32bb3e0843bd';
+      var room = uid;
+      var name = 'tagoto'
+
+      socket.on('connected', function() {
+          socket.json.emit('init', { 'room': room, 'name': name });
+      });
+
+      $('form').submit(() => {
+		$.get('push', {         
+	        	msg: $('#m').val(),
+	        	uid: uid
+	        }, function(data){  
+			//alert('ok')
+			//alert(uid)
+		});
+	        socket.emit('chat message', $('#m').val());
+//       socket.json.send('chat message', $('#m').val());
+        	$('#m').val('');
+	        return false;
         });
         socket.on('chat message', (msg) => {
             $('#messages').append($('<li>').text(msg));
